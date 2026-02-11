@@ -1,12 +1,10 @@
 """Video generation with frame chaining."""
 
-import time
 from pathlib import Path
 from typing import Optional
 
 import google.generativeai as genai
 from openai import OpenAI
-from PIL import Image
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from .models import FilmConfig, VideoClip, VideoProvider
@@ -28,7 +26,6 @@ def create_video_prompt(premise: str, clip_index: int, total_clips: int) -> str:
     elif clip_index == total_clips - 1:
         return f"{premise}. Final scene, resolution. Dramatic conclusion."
     else:
-        progress = (clip_index / total_clips) * 100
         return f"{premise}. Continuing the story (scene {clip_index + 1}). Build tension and progression."
 
 
@@ -55,24 +52,24 @@ def extract_last_frame(video_path: Path, output_path: Path) -> Path:
         )
 
     cap = cv2.VideoCapture(str(video_path))
-    
+
     # Get total frame count
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    
+
     # Set position to last frame
     cap.set(cv2.CAP_PROP_POS_FRAMES, total_frames - 1)
-    
+
     # Read the frame
     ret, frame = cap.read()
     cap.release()
-    
+
     if not ret:
         raise Exception(f"Failed to extract last frame from {video_path}")
-    
+
     # Save the frame
     output_path.parent.mkdir(parents=True, exist_ok=True)
     cv2.imwrite(str(output_path), frame)
-    
+
     return output_path
 
 
@@ -127,7 +124,7 @@ def generate_video_openai(
         # Download video
         video_url = response.url
         import requests
-        
+
         video_response = requests.get(video_url, timeout=300)
         video_response.raise_for_status()
 
@@ -174,12 +171,12 @@ def generate_video_gemini(
         Exception: If video generation fails
     """
     genai.configure(api_key=api_key)
-    
+
     # Note: This is a placeholder for Gemini video generation
     # Implementation depends on the actual Gemini video API when available
     try:
         model = genai.GenerativeModel("gemini-2.0-flash")
-        
+
         # For now, Gemini video generation may not be fully available
         # This is a forward-compatible implementation
         response = model.generate_video(
@@ -222,13 +219,13 @@ def generate_clip(
     if config.provider == VideoProvider.OPENAI:
         if not config.openai_api_key:
             raise ValueError("OpenAI API key required")
-        
+
         generate_fn = generate_video_openai
         api_key = config.openai_api_key
     else:
         if not config.gemini_api_key:
             raise ValueError("Gemini API key required")
-        
+
         generate_fn = generate_video_gemini
         api_key = config.gemini_api_key
 
@@ -242,7 +239,7 @@ def generate_clip(
         )
 
         clip.output_path = output_path
-        
+
         # Extract last frame for chaining to next clip
         if clip.index < total_clips - 1:
             last_frame_path = output_path.parent / f"clip_{clip.index}_last_frame.png"

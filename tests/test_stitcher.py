@@ -1,6 +1,7 @@
 """Tests for video stitching."""
 
 import pytest
+
 from short_film.stitcher import check_ffmpeg
 
 

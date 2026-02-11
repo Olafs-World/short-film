@@ -2,7 +2,6 @@
 
 from pathlib import Path
 
-import pytest
 from short_film.models import (
     ClipStatus,
     FilmConfig,
@@ -21,7 +20,7 @@ def test_video_clip_creation():
         prompt="Test prompt",
         duration=10.0,
     )
-    
+
     assert clip.index == 0
     assert clip.prompt == "Test prompt"
     assert clip.status == ClipStatus.PENDING
@@ -36,7 +35,7 @@ def test_film_config_creation():
         music_vibe=MusicVibe.EPIC,
         provider=VideoProvider.OPENAI,
     )
-    
+
     assert config.premise == "A test film"
     assert config.style == FilmStyle.CINEMATIC
     assert config.music_vibe == MusicVibe.EPIC
@@ -51,12 +50,12 @@ def test_film_state_creation():
         style=FilmStyle.ANIME,
         music_vibe=MusicVibe.UPBEAT,
     )
-    
+
     state = FilmState(
         config=config,
         output_dir=Path("/tmp/test"),
     )
-    
+
     assert state.config == config
     assert state.output_dir == Path("/tmp/test")
     assert state.completed is False

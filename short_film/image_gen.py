@@ -1,13 +1,9 @@
 """Image generation for starting frames."""
 
-import base64
-from io import BytesIO
 from pathlib import Path
-from typing import Optional
 
 import requests
 from openai import OpenAI
-from PIL import Image
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from .models import FilmConfig, FilmStyle
@@ -73,7 +69,7 @@ def generate_image_openai(
     )
 
     image_url = response.data[0].url
-    
+
     # Download the image
     img_response = requests.get(image_url, timeout=30)
     img_response.raise_for_status()
@@ -107,7 +103,7 @@ def generate_starting_frame(
         raise ValueError("OpenAI API key required for image generation")
 
     prompt = create_image_prompt(config.premise, config.style)
-    
+
     return generate_image_openai(
         prompt=prompt,
         api_key=config.openai_api_key,

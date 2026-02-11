@@ -29,10 +29,10 @@ def get_output_dir(base_dir: Optional[Path] = None) -> Path:
     """
     if base_dir is None:
         base_dir = Path.cwd() / "output"
-    
+
     base_dir = Path(base_dir)
     base_dir.mkdir(parents=True, exist_ok=True)
-    
+
     return base_dir
 
 

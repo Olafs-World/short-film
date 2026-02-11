@@ -1,6 +1,7 @@
 """Tests for image generation."""
 
 import pytest
+
 from short_film.image_gen import create_image_prompt
 from short_film.models import FilmStyle
 
@@ -8,7 +9,7 @@ from short_film.models import FilmStyle
 def test_create_image_prompt_cinematic():
     """Test creating image prompt for cinematic style."""
     prompt = create_image_prompt("A space station", FilmStyle.CINEMATIC)
-    
+
     assert "space station" in prompt.lower()
     assert "cinematic" in prompt.lower()
 
@@ -16,7 +17,7 @@ def test_create_image_prompt_cinematic():
 def test_create_image_prompt_noir():
     """Test creating image prompt for noir style."""
     prompt = create_image_prompt("A detective", FilmStyle.NOIR)
-    
+
     assert "detective" in prompt.lower()
     assert "noir" in prompt.lower()
     assert "black and white" in prompt.lower()
@@ -25,7 +26,7 @@ def test_create_image_prompt_noir():
 def test_create_image_prompt_anime():
     """Test creating image prompt for anime style."""
     prompt = create_image_prompt("A hero", FilmStyle.ANIME)
-    
+
     assert "hero" in prompt.lower()
     assert "anime" in prompt.lower()
 

@@ -2,10 +2,9 @@
 
 import math
 from pathlib import Path
-from typing import Optional
 
 from rich.console import Console
-from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TimeElapsedColumn
+from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
 
 from .image_gen import generate_starting_frame
 from .models import ClipStatus, FilmConfig, FilmState, VideoClip
@@ -30,7 +29,7 @@ class FilmGenerator:
         self.config = config
         self.output_dir = Path(output_dir)
         self.state_manager = StateManager(output_dir)
-        
+
         # Try to load existing state if resuming
         if resume:
             existing_state = self.state_manager.load()
@@ -51,7 +50,7 @@ class FilmGenerator:
             Initialized FilmState
         """
         num_clips = math.ceil(self.config.target_duration / self.config.clip_duration)
-        
+
         clips = [
             VideoClip(
                 index=i,
@@ -107,7 +106,7 @@ class FilmGenerator:
             self._save_state()
 
             console.print()
-            console.print(f"✅ Film generation complete!", style="bold green")
+            console.print("✅ Film generation complete!", style="bold green")
             console.print(f"📹 Output: {final_video}")
 
             return final_video
@@ -120,19 +119,19 @@ class FilmGenerator:
     def _generate_starting_frame(self) -> None:
         """Generate the starting frame."""
         console.print("🖼️  Generating starting frame...", style="cyan")
-        
+
         output_path = self.output_dir / "starting_frame.png"
-        
+
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
             console=console,
         ) as progress:
             task = progress.add_task("Generating image...", total=None)
-            
+
             starting_frame = generate_starting_frame(self.config, output_path)
             self.state.starting_frame_path = starting_frame
-            
+
             progress.update(task, completed=True)
 
         console.print(f"✓ Starting frame saved to {starting_frame}", style="green")
@@ -140,9 +139,9 @@ class FilmGenerator:
     def _generate_clips(self) -> None:
         """Generate all video clips with frame chaining."""
         console.print("🎥 Generating video clips...", style="cyan")
-        
+
         total_clips = len(self.state.clips)
-        
+
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
@@ -179,17 +178,17 @@ class FilmGenerator:
                 # Generate clip
                 clip.status = ClipStatus.GENERATING
                 progress.update(task, description=f"Generating clip {i + 1}/{total_clips}...")
-                
+
                 try:
                     updated_clip = generate_clip(clip, self.config, total_clips)
                     self.state.clips[i] = updated_clip
                     self.state.clips[i].status = ClipStatus.COMPLETED
-                    
+
                 except Exception as e:
                     self.state.clips[i].status = ClipStatus.FAILED
                     self.state.clips[i].error = str(e)
                     console.print(f"⚠️  Clip {i + 1} failed: {e}", style="yellow")
-                    
+
                 finally:
                     self._save_state()
                     progress.advance(task)
@@ -223,13 +222,13 @@ class FilmGenerator:
             console=console,
         ) as progress:
             task = progress.add_task("Stitching videos...", total=None)
-            
+
             # TODO: Add music if music_vibe is not NONE
             # This would require sourcing/generating music which is out of scope for MVP
             final_video = stitch_videos(completed_clips, final_output)
-            
+
             progress.update(task, completed=True)
 
         console.print(f"✓ Final film saved to {final_video}", style="green")
-        
+
         return final_video

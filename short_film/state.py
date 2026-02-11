@@ -26,10 +26,10 @@ class StateManager:
             state: Current film state
         """
         self.output_dir.mkdir(parents=True, exist_ok=True)
-        
+
         # Convert to dict with proper path serialization
         state_dict = state.model_dump(mode="json")
-        
+
         with open(self.state_file, "w") as f:
             json.dump(state_dict, f, indent=2)
 

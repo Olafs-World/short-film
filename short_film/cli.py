@@ -5,7 +5,7 @@ from typing import Optional
 
 import typer
 from rich.console import Console
-from rich.prompt import Prompt, Confirm
+from rich.prompt import Confirm, Prompt
 from rich.table import Table
 
 from . import __version__
@@ -108,15 +108,15 @@ def generate(
     if interactive and not premise:
         console.print("🎬 [bold blue]Welcome to Short Film Generator![/bold blue]")
         console.print()
-        
+
         premise = _prompt_premise()
         style = _prompt_style()
         music_vibe = _prompt_music_vibe()
-        
+
         console.print()
         _show_summary(premise, style, music_vibe, provider, duration)
         console.print()
-        
+
         if not Confirm.ask("Ready to generate?", default=True):
             console.print("Cancelled.", style="yellow")
             raise typer.Exit()
@@ -127,9 +127,9 @@ def generate(
 
     # Validate enums
     try:
-        style_enum = FilmStyle(style)
-        music_vibe_enum = MusicVibe(music_vibe)
-        provider_enum = VideoProvider(provider)
+        FilmStyle(style)
+        MusicVibe(music_vibe)
+        VideoProvider(provider)
     except ValueError as e:
         console.print(f"❌ Invalid option: {e}", style="red")
         raise typer.Exit(1)
@@ -153,7 +153,7 @@ def generate(
     try:
         generator = FilmGenerator(config, output_dir, resume=resume)
         final_video = generator.generate()
-        
+
         console.print()
         console.print("🎉 [bold green]Success![/bold green]")
         console.print(f"Your film is ready: [cyan]{final_video}[/cyan]")
@@ -218,7 +218,7 @@ def _prompt_premise() -> str:
     console.print("   • Two robots fall in love in a post-apocalyptic city")
     console.print("   • A detective chases a mysterious figure through rain-soaked streets")
     console.print()
-    
+
     premise = Prompt.ask("Film premise")
     return premise
 
@@ -227,18 +227,18 @@ def _prompt_style() -> str:
     """Prompt for film style."""
     console.print()
     console.print("🎨 [bold]Choose a film style[/bold]")
-    
+
     styles = [s.value for s in FilmStyle]
     for i, style in enumerate(styles, 1):
         console.print(f"   {i}. {style}")
-    
+
     console.print()
     choice = Prompt.ask(
         "Style",
         choices=styles + [str(i) for i in range(1, len(styles) + 1)],
         default="cinematic",
     )
-    
+
     # Convert number to style if needed
     if choice.isdigit():
         return styles[int(choice) - 1]
@@ -249,18 +249,18 @@ def _prompt_music_vibe() -> str:
     """Prompt for music vibe."""
     console.print()
     console.print("🎵 [bold]Choose a music vibe[/bold]")
-    
+
     vibes = [v.value for v in MusicVibe]
     for i, vibe in enumerate(vibes, 1):
         console.print(f"   {i}. {vibe}")
-    
+
     console.print()
     choice = Prompt.ask(
         "Music vibe",
         choices=vibes + [str(i) for i in range(1, len(vibes) + 1)],
         default="epic",
     )
-    
+
     # Convert number to vibe if needed
     if choice.isdigit():
         return vibes[int(choice) - 1]
@@ -272,13 +272,13 @@ def _show_summary(premise: str, style: str, music_vibe: str, provider: str, dura
     table = Table(title="Film Configuration", show_header=False, box=None)
     table.add_column("Key", style="cyan bold")
     table.add_column("Value", style="white")
-    
+
     table.add_row("Premise", premise)
     table.add_row("Style", style)
     table.add_row("Music", music_vibe)
     table.add_row("Provider", provider)
     table.add_row("Duration", f"{duration}s")
-    
+
     console.print(table)
 
 

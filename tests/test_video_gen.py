@@ -1,13 +1,14 @@
 """Tests for video generation."""
 
 import pytest
+
 from short_film.video_gen import create_video_prompt
 
 
 def test_create_video_prompt_first_clip():
     """Test creating prompt for first clip."""
     prompt = create_video_prompt("A robot explores", 0, 5)
-    
+
     assert "robot explores" in prompt.lower()
     assert "opening" in prompt.lower()
 
@@ -15,7 +16,7 @@ def test_create_video_prompt_first_clip():
 def test_create_video_prompt_middle_clip():
     """Test creating prompt for middle clip."""
     prompt = create_video_prompt("A robot explores", 2, 5)
-    
+
     assert "robot explores" in prompt.lower()
     assert "scene 3" in prompt.lower()
 
@@ -23,7 +24,7 @@ def test_create_video_prompt_middle_clip():
 def test_create_video_prompt_final_clip():
     """Test creating prompt for final clip."""
     prompt = create_video_prompt("A robot explores", 4, 5)
-    
+
     assert "robot explores" in prompt.lower()
     assert "final" in prompt.lower()
 
