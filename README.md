@@ -31,6 +31,15 @@ pipx install short-film
 pip install short-film
 ```
 
+### As an Agent Skill
+
+```bash
+npx skills add olafs-world/short-film
+
+# or with OpenClaw
+clawhub install olafs-world/short-film
+```
+
 ### Usage
 
 #### Interactive Mode (Recommended)
